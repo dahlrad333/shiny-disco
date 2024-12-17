@@ -1,6 +1,16 @@
 package helper
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
+
+var (
+	carMutex        sync.Mutex
+	planeMutex      sync.Mutex
+	motorcycleMutex sync.Mutex
+	boatMutex       sync.Mutex
+)
 
 type Vehicle interface {
 	Start()
