@@ -2,6 +2,7 @@
 XX
 
 ## Graph Database 
+```mermaid
 erDiagram
     DOMAIN {
       string name
