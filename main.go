@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,16 +12,19 @@ import (
 
 func main() {
 	// >>>>>>>> TOPIC 1.1, 1.2 VEHICLES
-	_ = BuildVehicles()
+	// _ = BuildVehicles()
 
-	// >>>>>>>> TOPIC 1.3 HTTP LOGGING WRAPPER
-	StartHttpListener()
+	// >>>>>>>> TOPIC 1.3 HTTP LOGGING MIDDLEWARE
+	// StartHttpListener()
 
 	// >>>>>>>> TOPIC 2.1 TYPE REFLECTION
-	VehicleReflections()
+	// VehicleReflections()
 
 	// >>>>>>>> TOPIC 3.1 CHANNEL & CONTEXT
-	RunWorkerpool()
+	// RunWorkerpool()
+
+	// >>>>>>>> TOPIC 4.1 CUSTOM ERROR HANDLING
+	ErrorExample()
 }
 
 // server constructors from outside package
@@ -96,4 +100,38 @@ func RunWorkerpool() {
 	fmt.Println("Context timeout reached")
 
 	workerPool.Shutdown()
+}
+
+func ErrorExample() {
+	insufficientFundsError := server.NewTransactionError(
+		server.InsufficientFunds,
+		"12345",
+		"Attempted to withdraw $500, but balance is $300",
+		nil,
+	)
+
+	accountLockedError := server.NewTransactionError(
+		server.AccountLocked,
+		"67890",
+		"Account is locked due to suspicious activity",
+		errors.New("manual lock applied by admin"),
+	)
+
+	dailyLimitError := server.NewTransactionError(
+		server.DailyLimitExceeded,
+		"12345",
+		"Daily withdrawal limit of $1000 exceeded",
+		nil,
+	)
+
+	// Simulate handling these errors
+	server.HandleError(insufficientFundsError)
+	server.HandleError(accountLockedError)
+	server.HandleError(dailyLimitError)
+
+	// Example of using errors.Is to check for specific errors
+	wrappedError := fmt.Errorf("failed transaction: %w", accountLockedError)
+	if errors.Is(wrappedError, accountLockedError) {
+		fmt.Println("Detected: Account Locked Error via errors.Is")
+	}
 }
